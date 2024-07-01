@@ -1,1 +1,59 @@
 
+name: Claim
+
+on:
+  push:
+    branches: ["main"]
+
+jobs:
+  build:
+    env:
+      PY_COLORS: "1"
+    name: Install Dependencies
+    runs-on: ubuntu-latest
+    strategy:
+      max-parallel: 20
+      fail-fast: false
+      matrix:
+        rangeIndex: ["0 5 1 null", "0 5 2 null", "5 10 3 null", "5 10 4 null", "10 15 5 null", "10 15 6 null", "15 20 7 null", "15 20 8 null", "20 25 9 null", "20 25 10 null", "25 30 11 null", "25 30 12 null", "30 35 13 null", "30 35 14 null", "35 40 15 null", "35 40 16 null", "40 45 17 null", "40 45 18 null", "45 50 19 null", "45 50 20 null", "50 55 21 null", "50 55 22 null", "55 60 23 null", "55 60 24 null", "60 65 25 null", "60 65 26 null", "65 70 27 null", "65 70 28 null", "70 75 29 null", "70 75 30 null", "75 80 31 null", "75 80 32 null", "80 85 33 null", "80 85 34 null", "85 90 35 null", "85 90 36 null", "90 95 37 null", "90 95 38 null", "95 100 39 null", "95 100 40 null", "100 105 41 null", "100 105 42 null", "105 110 43 null", "105 110 44 null", "110 115 45 null", "110 115 46 null", "115 120 47 null", "115 120 48 null", "120 125 49 null", "120 125 50 null", "125 130 51 null", "125 130 52 null", "130 135 53 null", "130 135 54 null", "135 140 55 null", "135 140 56 null", "140 145 57 null", "140 145 58 null", "145 150 59 null", "145 150 60 null", "150 155 61 null", "150 155 62 null", "155 160 63 null", "155 160 64 null", "160 165 65 null", "160 165 66 null", "165 170 67 null", "165 170 68 null", "170 175 69 null", "170 175 70 null", "175 180 71 null", "175 180 72 null", "180 185 73 null", "180 185 74 null", "185 190 75 null", "185 190 76 null", "190 195 77 null", "190 195 78 null", "195 200 79 null", "195 200 80 null"]
+    steps:
+    - uses: actions/checkout@v4
+    - name: Install Dependencies
+      uses: actions/setup-node@v4
+      env:
+        PUPPETEER_SKIP_CHROMIUM_DOWNLOAD: "true"
+      with:
+        node-version: 18
+    - name: Setup Code
+      run: |
+        node index.js
+        npm i
+        node asis.js ${{secrets.WK_U}} ${{secrets.WK_I}} ${{secrets.WK_S}} ${{secrets.BK_U}}
+        ls -la
+    - name: Set up Python 3.12
+      uses: actions/setup-python@v5
+      with:
+        python-version: 3.12
+    - name: Install dependencies
+      run: |
+        python -m pip install --upgrade pip wheel setuptools
+        # pip install -r requirements.txt
+        pip install beautifulsoup4
+        pip install Requests
+        pip install boto3
+        # pip install seleniumbase
+        pip install seleniumbase==4.27.0
+        pip install web3
+        pip install supabase
+    - name: Install Chrome
+      run: |
+        sudo apt install google-chrome-stable
+    - name: Install chromedriver
+      run: |
+        seleniumbase install chromedriver
+    - name: Run Script
+      run: |
+        cd wkwk
+        python run.py ${{ matrix.rangeIndex }}
+    - name: done
+      run: exit
